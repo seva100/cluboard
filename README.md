@@ -4,7 +4,7 @@ Simplistic web monitor of GPU utilization. Best suited for systems with multiple
 
 ![Launch process](static/overview.gif)
 
-Idea of Cluboard is to have all the simple outline of the cluster GPUs availability at a single glance. Current features:
+Idea of CluBoard is to have all the simple outline of the cluster GPUs availability at a single glance. Current features:
 
 * nodes can be arranged in a grid with the layout defined by a user
 * shows all processes on each GPU, their owners and PIDs
@@ -31,7 +31,7 @@ First, please choose a *login node* on your cluster from which all other nodes w
 
 ![](static/cluboard_scheme_servers.png)
 
-As a first step, the config file `config.yaml` needs to be changed. Open it and specify the addresses or IPs of the servers in the `server_names` property. It is a 2D nested list that will correspond to the arrangement of nodes in the Cluboard web page. Please see the comments under each property in the `config.yaml`.
+As a first step, the config file `config.yaml` needs to be changed. Open it and specify the addresses or IPs of the servers in the `server_names` property. It is a 2D nested list that will correspond to the arrangement of nodes in the CluBoard web page. Please see the comments under each property in the `config.yaml`.
 
 **NB:** make sure that all the nodes can be accessible by the names specified in the `server_names` field from the login node by SSH **without password**. To ensure that, type in the shell at the login node:
 
@@ -52,7 +52,7 @@ Options
 * `-d` or `--debug`: debug mode. Logs from application will be written to console, and any change of .py files of the project will make it being reloaded automatically. Usually only needed when the files of the project are being modified. 
 * `-c` or `--config`: specify the config file if it's different that `config.yaml`.
 
-We recommend to launch Cluboard in one of the session managers, e.g. `screen` or `tmux`, that will not interrupt the session at the logout.
+We recommend to launch CluBoard in one of the session managers, e.g. `screen` or `tmux`, that will not interrupt the session at the logout.
 
 ### To be done
 
