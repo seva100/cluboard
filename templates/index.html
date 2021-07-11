@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" http-equiv="refresh" content="100">
+    <title>Cluster GPU Monitor</title>
+
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+
+    <!-- Loading Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
+          integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+    <!-- Loading Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+            integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"
+            integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js"
+            integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+
+    <!-- Custom styles -->
+    {% if print_lab_names %}
+        {% set lab_names_pane_w = lab_names_pane_width %}
+    {% else %}
+        {% set lab_names_pane_w = 0 %}
+    {% endif %}
+    {% if print_top_utilizing_users %}
+        {% set user_stats_pane_h = 12 %}
+    {% else %}
+        {% set user_stats_pane_h = 0 %}
+    {% endif %}
+    {% set pane_h = (99 - user_stats_pane_h) / n_rows %}
+    {% set pane_w = (99 - lab_names_pane_w) / n_cols %}
+
+    <style>
+        html,
+        body {
+          height: 100%;
+          padding: 0;
+          margin: 0;
+        }
+
+        div_lab_name {
+            width: {{ lab_names_pane_w }}%;
+            height: {{ pane_h }}%;
+            float: left;
+            overflow: auto;
+        }
+
+        div_pane {
+          width: {{ pane_w }}%;
+          height: {{ pane_h }}%;
+          float: left;
+          overflow:auto;
+        }
+
+        div_top_users_left_pane {
+          width:  {{ lab_names_pane_w }}%;
+          height: {{ user_stats_pane_h }}%;
+          float: left;
+          overflow:auto;
+        }
+
+        div_top_users_main_pane {
+          width: {{ pane_w }}%;
+          height: {{ user_stats_pane_h }}%;
+          float: left;
+          overflow:auto;
+        }
+
+        div_lab_name_text {
+          white-space: pre-line;
+          font-size: 30px;
+          overflow: auto;
+        }
+
+        div_text {
+          white-space: pre-line;
+          font-size: 15px;
+          overflow: auto;
+        }
+
+        div_top_users_text {
+          white-space: pre-line;
+          font-size: 20px;
+          overflow: auto;
+        }
+
+        div_odd_background_color {
+          background: #efefef;
+        }
+
+        div_even_background_color {
+          background: #f7f7f7;
+        }
+
+        h1 { font-family: monospace; font-size: 23px; font-style: normal; font-variant: normal; font-weight: 700; line-height: 23px; }
+        h3 { font-family: monospace; font-size: 17px; font-style: normal; font-variant: normal; font-weight: 700; line-height: 23px; }
+        p { font-family: monospace; font-size: 15px; font-style: normal; font-variant: normal; font-weight: 400; line-height: 23px; }
+        blockquote { font-family: monospace; font-size: 17px; font-style: normal; font-variant: normal; font-weight: 400; line-height: 23px; }
+        pre { font-family: monospace; font-size: 15px; font-style: normal; font-variant: normal; font-weight: 400;
+            line-height: 23px; white-space:pre-wrap; word-wrap:break-word; }
+    </style>
+
+    {% for i in range(n_rows) %}
+        {% for j in range(n_cols) %}
+            {% set pane_no = i * n_cols + j %}
+
+            {% if j == 0 %}
+                <div_lab_name>
+                    <div_lab_name_text>{{ lab_names[i] }}</div_lab_name_text>
+                </div_lab_name>
+            {% endif %}
+
+            <div_pane style="background: {{ '#f7f7f7' if pane_no % 2 == 0 else '#efefef' }}">
+                <div_text id="text{{ pane_no + 1}}">Loading...</div_text>
+            </div_pane>
+        {% endfor %}
+    {% endfor %}
+
+    {% if print_top_utilizing_users %}
+        <div_top_users_left_pane><div_lab_name_text></div_lab_name_text></div_top_users_left_pane>
+        <div_top_users_main_pane>
+            <div_top_users_text id="text_top_users">Loading...</div_top_users_text>
+        </div_top_users_main_pane>
+    {% endif %}
+
+    <script>
+        {% for i in range(n_rows) %}
+            {% for j in range(n_cols) %}
+                {% set pane_no = i * n_cols + j + 1 %}  
+                setInterval(get_data_{{ i }}_{{ j }}, 1000);
+
+                function get_data_{{ i }}_{{ j }}() {
+                    $.ajax({
+                        type: "POST",
+                        url: "{{ url_for('get_gpustat') }}",
+                        data: {
+                            "i": {{ i }},
+                            "j": {{ j }}
+                        },
+                        success: function(result) {
+                            $('#text{{ pane_no }}').html(result.text);
+                        },
+                        error: function(result) {
+                            console.log('error');
+                        }
+                    });
+                }
+            {% endfor %}
+        {% endfor %}
+
+        {% if print_top_utilizing_users %}
+            setInterval(get_top_users, 1000);
+
+            function get_top_users() {
+                $.ajax({
+                    type: "POST",
+                    url: "{{ url_for('get_top_users') }}",
+                    data: {},
+                    success: function(result) {
+                        $('#text_top_users').html(result.text);
+                    },
+                    error: function(result) {
+                        console.log('error');
+                    }
+                });
+            }
+        {% endif %}
+    </script>
+
+
+</head>
+<body>
+
+</body>
+</html>

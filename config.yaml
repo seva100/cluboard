@@ -1,0 +1,28 @@
+### Config for GPU monitor.
+###
+### All parameters except `server_names` can be omitted -- 
+### they will be overriden by their defaults in this case.
+
+# Addresses or IPs of all computing servers, which GPUs will be shown on the monitor. Mandatory parameter.
+# The names must be encapsulated in a list of lists, where each inner list corresponds to a row in the table. This way you specify the desired location of each server pane in a web page.
+server_names: [['foo', 'bar'], 
+               ['192.168.1.0'],
+               ['865.264.5.3', 'mylovelyserver', 'gpumonster.my.hosting.eu'],
+              ]
+
+lab_names:
+  show: False    # Whether to show names of laboratories (= servers groups). Optional (default: False).
+  lab_names: ['AlchemyLab', 'FlyingPedestriansLab', 'CrawlingCatsLab']    # Names of laboratories (= servers groups). 
+  pane_width: 8    # Width of the lab names column.
+                                                       # Number of laboratories must be the same as number of rows in the table.
+                                                       # Mandatory only if show: True.
+
+top_utilizing_users:
+  show: True    # Whether to show top users according to their GPU usage. Optional (default: False).
+  n_top_users_to_show: 10       # How many users with largest GPU utilization to show. Optional (default: 10).
+  critical_number_of_gpus: 8    # If user consumes at least critical_number_of_gpus GPUs,
+                                # their record will be marked red and bold. Optional (default: 8).
+
+additional_stats_to_show: ['cpu', 'ram', 'swap']     # Whether to show statistics on CPU, RAM, Swap usage for each computing machine.
+                                                     # The value must be a list containing any subset of ['cpu', 'ram', 'swap']. (can be empty subset: [] ).
+                                                     # Optional (default: ['cpu', 'ram', 'swap']).
