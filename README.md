@@ -1,12 +1,13 @@
-### cluboard
+### CluBoard
 
 Simplistic web monitor of GPU utilization. Best suited for systems with multiple GPUs and many users. Build upon `gpustat`. 
 
-TODO video here.
+![Launch process](static/overview.gif)
 
 Idea of Cluboard is to have all the simple outline of the cluster GPUs availability at a single glance. Current features:
 
 * nodes can be arranged in a grid with the layout defined by a user
+* shows all processes on each GPU, their owners and PIDs
 * along with GPUs statistics, current CPU + RAM + Swap usage are reported for each node
 * top users by GPU usage
 * highlighting the users who allocated too many GPUs
@@ -60,4 +61,4 @@ We recommend to launch Cluboard in one of the session managers, e.g. `screen` or
 
 ### PRs
 
-Pull requests & suggestions are much appreciated &mdash; please don't hesitate to open an issue or to contribute. 
+Pull requests & suggestions are much appreciated &mdash; please don't hesitate to open an issue or to contribute. Since the codebase is in the very early state, bugs for various systems can be present -- please open an issue in this case as well.

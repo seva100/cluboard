@@ -2,14 +2,12 @@ import os
 import math
 import re
 from typing import ClassVar
-from utils import unflatten_list
-import yaml
+from utils import match_server_names_to_aliases, unflatten_list
 from functools import reduce
-from collections import Counter, defaultdict
+from collections import Counter
 from flask import Flask, render_template, request
 from flask import json
 import paramiko
-from pprint import pprint
 
 from interval import Interval
 from parse_config import parse_config
@@ -31,8 +29,7 @@ def main():
     n_rows = len(config['server_names'])
     n_cols = max([len(inner_list) for inner_list in config['server_names']])
 
-    print('PANE WIDTH', config['lab_names']['pane_width'])
-    return render_template("index_dev.html",
+    return render_template("index.html",
                            n_rows=n_rows,
                            n_cols=n_cols,
                            print_top_utilizing_users=config['top_utilizing_users']['show'],
@@ -78,7 +75,7 @@ def cmd_output_on_server(server_no, cmd):
         cur_data = ssh_connections[server_no].exec_command(cmd)[1] \
             .read().decode('utf-8')
     except paramiko.ssh_exception.ChannelException:
-        print('paramiko.ssh_exception.ChannelException caught')
+        print('paramiko.ssh_exception.ChannelException caught -- continuing')
         return
     cur_data = cur_data.strip()
     return cur_data
@@ -104,16 +101,12 @@ def get_additional_data(server_no, stat_type):
 
 def get_gpustat_output(server_no):
     cmd = '''
-    /rhome/asevastopolsky/miniconda3/bin/gpustat -p -P -u
+    gpustat -p -P -u
     '''
     return cmd_output_on_server(server_no, cmd)
 
 
 def save_machine_info(server_no):
-    print('server_no', server_no)
-    if server_no == 0:
-        print('ssh connections', ssh_connections[server_no])
-
     if ssh_connections[server_no] is None:
         return
     cur_data = get_gpustat_output(server_no)
@@ -130,14 +123,13 @@ def save_machine_info(server_no):
     for i, line_raw in enumerate(cur_data):
         
         line_parts = line_raw.split(' ')
-        # print('line parts before:', line_parts)
         line_parts = [part for part in line_parts if 'root' not in part or '5M' not in part]
-        # print('line parts after:', line_parts)
         line = ' '.join(line_parts)
 
         if '|' not in line:
             line = line.split(' ')
-            line[0] = f'<b>{line[0]}</b>'
+            alias = names2aliases[line[0].strip()]
+            line[0] = f'<b>{alias}</b>'
             cur_data[i] = ' '.join(line)
             for stat_name in config['additional_stats_to_show']:
                 cur_data[i] += ' | ' + additional_stats[stat_name]
@@ -156,8 +148,6 @@ def save_machine_info(server_no):
 
     cur_data = '\n'.join(cur_data)
     cur_data = f"<pre>{cur_data}</pre>"
-    if server_no == 0:
-        print(f'latest_gpustat[{server_no}] = {cur_data}')
     latest_gpustat[server_no] = cur_data
 
 
@@ -168,13 +158,8 @@ def get_gpustat():
     if (0 <= server_i < len(config['server_names']) 
         and 0 <= server_j < len(config['server_names'][server_i])):
         server_no = group_inds[server_i] + server_j
-        
-        if server_no == 0:
-        # print(f'server_i {server_i} server_j {server_j} server_no {server_no}')
-            print('[get_gpustat]', latest_gpustat[server_no])
         data = {"text": latest_gpustat[server_no]}
     else:
-        print(f'server_i {server_i} server_j {server_j} None')
         data = {"text": ""}
     
     return (json.dumps(data),
@@ -199,33 +184,35 @@ def get_top_users():
             {'Content-Type': 'application/json'})
 
 
-print('__name__:', __name__)
-if __name__ == "main":
+if __name__ == "main":    # Proper test block for the Flask app 
+                          # (corresponds to the basename of the "main.py" script)
+    
     # Reading and processing configuration file.
     config_file = 'config.yaml'
     default_config_file = 'templates/default_config.yaml'
 
     if 'MONITOR_CONFIG_FILE' in os.environ:
         config_file = os.environ['MONITOR_CONFIG_FILE']
-    print('config_file:', config_file)
     
     config = parse_config(config_file)
 
-    intervals = None
-    
     server_names, group_inds = unflatten_list(config['server_names'])
+    names2aliases = match_server_names_to_aliases(config['server_names'], config['server_aliases'])
+
+    # Opening SSH connections
+    intervals = None
     ssh_connections = [None for i in range(len(server_names))]
 
     for i in range(len(server_names)):
         ssh_connections[i] = paramiko.SSHClient()
         ssh_connections[i].load_system_host_keys()
-        print(server_names[i])
         # suppress_ssh_exception(ssh_connections[i].connect, config['server_names'][i], username=login_username)
-        print('server_names[i]:', server_names[i])
         suppress_ssh_exception(ssh_connections[i].connect, server_names[i])
+        print("Connection established with", names2aliases[server_names[i]])
 
     latest_gpustat = ["" for _ in server_names]
     latest_users_stats = [Counter() for _ in server_names]
     latest_users_stats_overall = Counter()
 
+    # Starting the app
     app.run(host="0.0.0.0", port=8080)

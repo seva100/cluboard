@@ -3,25 +3,31 @@
 ### All parameters except `server_names` can be omitted -- 
 ### they will be overriden by their defaults in this case.
 
-# Addresses or IPs of all computing servers, which GPUs will be shown on the monitor. Mandatory parameter.
+# Addresses or IPs of all computing servers, which GPUs will be shown on the monitor. 
 # The names must be encapsulated in a list of lists, where each inner list corresponds to a row in the table. This way you specify the desired location of each server pane in a web page.
+# Mandatory parameter.
 server_names: [['foo', 'bar'], 
                ['192.168.1.0'],
                ['865.264.5.3', 'mylovelyserver', 'gpumonster.my.hosting.eu'],
               ]
+server_aliases: None    # Aliases for each of the servers. 
+                        # Should either be None or be a nested list,
+                        # where alias for each of the servers is specified 
+                        # (or None if no alias is needed for the server).
 
 lab_names:
   show: False    # Whether to show names of laboratories (= servers groups). Optional (default: False).
   lab_names: ['AlchemyLab', 'FlyingPedestriansLab', 'CrawlingCatsLab']    # Names of laboratories (= servers groups). 
-  pane_width: 8    # Width of the lab names column.
-                                                       # Number of laboratories must be the same as number of rows in the table.
-                                                       # Mandatory only if show: True.
+                                                                          # Mandatory if show: True.
+  pane_width: 8    # Width of the lab names column. Optional (default: 6)
+                   # Number of laboratories must be the same as number of rows in the table.
 
 top_utilizing_users:
-  show: True    # Whether to show top users according to their GPU usage. Optional (default: False).
+  show: True    # Whether to show top users according to their GPU usage. Optional (default: True).
   n_top_users_to_show: 10       # How many users with largest GPU utilization to show. Optional (default: 10).
   critical_number_of_gpus: 8    # If user consumes at least critical_number_of_gpus GPUs,
-                                # their record will be marked red and bold. Optional (default: 8).
+                                # their record will be marked red and bold. Number of -1 means disabling the feature.
+                                # Optional (default: -1 == disabled).
 
 additional_stats_to_show: ['cpu', 'ram', 'swap']     # Whether to show statistics on CPU, RAM, Swap usage for each computing machine.
                                                      # The value must be a list containing any subset of ['cpu', 'ram', 'swap']. (can be empty subset: [] ).

@@ -7,6 +7,11 @@
 # The names must be encapsulated in a list of lists, where each inner list corresponds to a row in the table. This way you specify the desired location of each server pane in a web page.
 server_names: None
 
+server_aliases: None    # Aliases for each of the servers. 
+                        # Should either be None or be a nested list,
+                        # where alias for each of the servers is specified 
+                        # (or None if no alias is needed for the server).
+
 lab_names:
   show: False    # Whether to show names of laboratories (= servers groups). Optional (default: False).
   lab_names: ['AlchemyLab', 'FlyingPedestriansLab', 'CrawlingCatsLab']    # Names of laboratories (= servers groups). 
