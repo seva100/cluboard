@@ -1,4 +1,4 @@
-### CluBoard
+### <img src="static/favicon.ico" width="16"></img> &nbsp; CluBoard
 
 Simplistic web monitor of GPU utilization. Best suited for systems with multiple GPUs and many users. Build upon `gpustat`. 
 
