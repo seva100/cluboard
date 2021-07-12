@@ -6,12 +6,12 @@ Simplistic web monitor of GPU utilization. Best suited for systems with multiple
 
 Idea of CluBoard is to have all the simple outline of the cluster GPUs availability at a single glance. Current features:
 
-* nodes can be arranged in a grid with the layout defined by a user and given aliases
-* shows all processes on each GPU, their owners and PIDs
-* along with GPUs statistics, current CPU + RAM + Swap usage are reported for each node
-* top users by GPU usage
-* highlighting the users who allocated too many GPUs
-* specification of the lab names
+* nodes can be **arranged in a grid** with the layout defined by a user and given **aliases**
+* shows all processes on each GPU, their **owners and PIDs**
+* along with GPUs statistics, current **CPU + RAM + Swap** usage are reported for each node
+* **top users** by GPU usage
+* **highlighting** the users who allocated too many GPUs
+* specification of the **lab names**
 
 The monitor can be an additional tool for clusters equipped with job management systems such as SLURM, IBM Spectrum LSF, etc.
 
@@ -47,7 +47,7 @@ If everything is OK, the shell of the `one_of_my_servers.com` will open. If the 
 
 To launch the monitor, 
 ```bash
-bash gpu_monitor_start.sh [-h] [-p|--port <port>] [-d|--debug] [-c|--config]
+bash gpu_monitor_start.sh [-h] [-p|--port <port>] [-d|--debug] [-c|--config <config_path>]
 ```
 
 Options:
