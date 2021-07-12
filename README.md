@@ -45,6 +45,8 @@ If everything is OK, the shell of the `one_of_my_servers.com` will open. If the 
 
 ---
 
+Make sure that the `gpustat` pip package is installed on all machines to be accessed. If the machines do not share the same environment, running `pip install gpustat` on each of them will fix it.
+
 To launch the monitor, 
 ```bash
 bash gpu_monitor_start.sh [-h] [-p|--port <port>] [-d|--debug] [-c|--config <config_path>]
